@@ -8,5 +8,5 @@ define("AWS_ACCESS_KEY_ID", $key);
 define("AWS_SECRET_ACCESS_KEY", $secret);
 define("S3_BUCKET", $default_bucket);
 define("S3_VERSION", "latest");
-define("S3_REGION", "");
+define("S3_REGION", "us-east-1");
 define("IMAGELIST_FILE", "imagelist.txt");
