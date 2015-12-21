@@ -83,7 +83,7 @@ if(!empty($_POST['submit'])){
 <html>
 <head>
 <meta charset="utf-8">
-<title>Homework 3</title>
+<title>Image Upload</title>
 <!-- Bootstrap -->
 <link href="./bootstrap-3.3.6/css/bootstrap.min.css" rel="stylesheet">
 <style>
@@ -130,7 +130,9 @@ body {
         <?php if($message != ''){ ?>
         <p class="bg-warning"><?=$message?></p>
         <?php } ?>
-         <div class="image-proview" id="image-proview-layer"></div>
+         <div class="image-proview" id="image-proview-layer">
+            <img id="reg_pic" src=""/>
+         </div>
         <form method="POST" action="" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="exampleInputFile">Bucket</label>
@@ -145,7 +147,7 @@ body {
             </div>
             <div class="form-group">
                 <label for="exampleInputFile">File upload</label>
-                <input type="file" name="uploadfile" id="exampleInputFile" class="form-control">
+                <input type="file" name="uploadfile" id="exampleInputFile" class="form-control" onchange="ImagesProview(this)">
             </div>
             <input type="submit" name="submit" class="btn btn-primary" value="Upload Image" />
         </form>
