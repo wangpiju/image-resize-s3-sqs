@@ -96,25 +96,31 @@ body {
 }
 </style>
 <link rel="Shortcut Icon" type="image/x-icon" href="smallicon.png" />
-
-
-
 </head>
+
 <body>
-    <nav class="navbar navbar-default">
-        <div class="container-fluid">
-            <div class="collapse navbar-collapse"
-                id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="fileupload.php">Upload Page <span class="sr-only">(current)</span></a></li>
-                    <li><a href="filedownload.php">Download Page</a></li>
-                </ul>
-            </div>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Image Upload Component</a>
         </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Image Upload</a></li>
+            <li><a href="./filedownload.php">Image List</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
     </nav>
     <div class="row">
         <div class="col-md-1"></div>
-        <div class="col-md-10"><h2>Upload File to AWS S3</h2></div>
+        <div class="col-md-10"><h2>Upload File to AWS S3 (using heroku redis cache)</h2></div>
         <div class="col-md-1"></div>
     </div>
     <div class="row">
