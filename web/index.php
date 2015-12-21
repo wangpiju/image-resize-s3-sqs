@@ -130,9 +130,10 @@ body {
         <?php if($message != ''){ ?>
         <p class="bg-warning"><?=$message?></p>
         <?php } ?>
+         <div class="image-proview" id="image-proview-layer"></div>
         <form method="POST" action="" enctype="multipart/form-data">
             <div class="form-group">
-                <label for="exampleInputFile">Choose Bucket</label>
+                <label for="exampleInputFile">Bucket</label>
                 <select name="bucket" class="form-control">
                     <?php 
                     $buckets = $s3->listBuckets();
@@ -156,5 +157,32 @@ body {
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="./bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <!-- javascript 縮圖程式 -->
+    <script type="text/javascript">
+        var isIE=function() {
+           return (document.all) ? true : false;
+        }
+
+        function ImagesProview(obj) {
+            var newPreview = document.getElementById("image-proview-layer");
+            var imagelayer = document.getElementById('image-proview') 
+            if(imagelayer){
+                newPreview.removeChild(imagelayer);
+            }
+
+            if (isIE()) {
+                obj.select();  
+                var imgSrc = document.selection.createRange().text;  
+                var objPreviewFake = document.getElementById('image-proview-layer');
+                objPreviewFake.filters.item('DXImageTransform.Microsoft.AlphaImageLoader').src = imgSrc;  
+            } else {
+                window.URL = window.URL || window.webkitURL;
+                newPreview.innerHTML = "<img src='"+window.URL.createObjectURL(obj.files[0])+"' id='image-proview'/>"
+            }
+        }
+
+       
+      
+    </script>
 </body>
 </html>
