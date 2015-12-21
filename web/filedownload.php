@@ -71,9 +71,9 @@ body {
                     <th>Bucket</th>
                     <th>File Name</th>
                     <th>File type</th>
-                    <th>File size</th>
-                    <th>File</th>
-                    <th>Place</th>
+                   
+                    <th>Image</th>
+                    
                 </tr>
             <?php 
                $arList = $redis->keys("*");
@@ -92,9 +92,9 @@ body {
                        echo '<td>'.$bucket.'</td>';
                        echo '<td>'.$filename.'</td>';
                        echo '<td>'.$filetype.'</td>';
-                       echo '<td>'.$filesize.'</td>';
+  
                        echo '<td><a href="https://s3-us-west-2.amazonaws.com/'.$bucket.'/'.$filename.'"><img src="data:image/jpeg;base64,' . $filedata . '" width="100" /></a></td>';
-                       echo '<td>Redis</td>';
+                       
                        echo '</tr>';
                    }else if($key != ''){
                        // only exsist on AWS S3
@@ -109,9 +109,9 @@ body {
                        echo '<td>'.$bucket.'</td>';
                        echo '<td>'.$filename.'</td>';
                        echo '<td>'.$filetype.'</td>';
-                       echo '<td>'.$filesize.'</td>';
+                      
                        echo '<td><a href="https://s3-us-west-2.amazonaws.com/'.$bucket.'/'.$filename.'"><img src="https://s3-us-west-2.amazonaws.com/'.$bucket.'/'.$filename.'" width="100" /></a></td>';
-                       echo '<td>AWS S3</td>';
+                       
                        echo '</tr>';
                    }
                }
