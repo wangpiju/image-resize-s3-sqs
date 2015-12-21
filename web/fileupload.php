@@ -26,40 +26,40 @@ if(!empty($_POST['submit'])){
         $redis->mset($filekey, $base64);
 
         // // create or update imagelist.txt
-        // if($s3->doesObjectExist(S3_BUCKET, IMAGELIST_FILE)){
-        //     // exsist
-        //     $txtfile = $s3->getObject([
-        //         'Bucket'    => S3_BUCKET,
-        //         'Key'       => IMAGELIST_FILE
-        //     ]);
-        //     $txtbody = $txtfile['Body'].$filekey.PHP_EOL;
-        //     try {
-        //         $s3->deleteObject([
-        //             'Bucket' => S3_BUCKET,
-        //             'Key'    => IMAGELIST_FILE
-        //         ]);
-        //         $s3->putObject([
-        //             'Bucket' => S3_BUCKET,
-        //             'Key'    => IMAGELIST_FILE,
-        //             'Body'   => $txtbody,
-        //             'ACL'    => 'public-read-write',  // use read write
-        //         ]);
-        //     } catch (Aws\Exception\S3Exception $e) {
-        //         $message .= "There was an error deleting and creating imagelist.txt.\r\n";
-        //     }
-        // }else{
-        //     // create imagelist.txt
-        //     try {
-        //         $s3->putObject([
-        //             'Bucket' => S3_BUCKET,
-        //             'Key'    => IMAGELIST_FILE,
-        //             'Body'   => $filekey.PHP_EOL,
-        //             'ACL'    => 'public-read-write',  // use read write
-        //         ]);
-        //     } catch (Aws\Exception\S3Exception $e) {
-        //         $message .= "There was an error creating imagelist.txt.\r\n";
-        //     }
-        // }
+        if($s3->doesObjectExist(S3_BUCKET, IMAGELIST_FILE)){
+            // exsist
+            $txtfile = $s3->getObject([
+                'Bucket'    => S3_BUCKET,
+                'Key'       => IMAGELIST_FILE
+            ]);
+            $txtbody = $txtfile['Body'].$filekey.PHP_EOL;
+            try {
+                $s3->deleteObject([
+                    'Bucket' => S3_BUCKET,
+                    'Key'    => IMAGELIST_FILE
+                ]);
+                $s3->putObject([
+                    'Bucket' => S3_BUCKET,
+                    'Key'    => IMAGELIST_FILE,
+                    'Body'   => $txtbody,
+                    'ACL'    => 'public-read-write',  // use read write
+                ]);
+            } catch (Aws\Exception\S3Exception $e) {
+                $message .= "There was an error deleting and creating imagelist.txt.\r\n";
+            }
+        }else{
+            // create imagelist.txt
+            try {
+                $s3->putObject([
+                    'Bucket' => S3_BUCKET,
+                    'Key'    => IMAGELIST_FILE,
+                    'Body'   => $filekey.PHP_EOL,
+                    'ACL'    => 'public-read-write',  // use read write
+                ]);
+            } catch (Aws\Exception\S3Exception $e) {
+                $message .= "There was an error creating imagelist.txt.\r\n";
+            }
+        }
         
         // upload file to selected bucket
         try {
