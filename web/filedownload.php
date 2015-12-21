@@ -59,7 +59,7 @@ body {
     </nav>
 	<div class="container">
       <div class="starter-template">
-        <h1>You can start uploading your images(using s3 and heroku redis cache)</h1>
+        <h1>You can start uploading your images<br/>(using s3 and heroku redis cache)</h1>
         <p class="lead"><br> </p>
       </div>
   </div>
