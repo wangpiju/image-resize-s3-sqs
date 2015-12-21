@@ -1,5 +1,5 @@
 {
-  "name": "Heroku-AWS-S3-php",
+  "name": "redis-s3-upload",
   "description": "A PHP app that can upload and download files from AWS S3 and host on Heroku",
   "repository": "https://github.com/wangpiju/redisseupload",
   "addons": []

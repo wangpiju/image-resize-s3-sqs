@@ -55,7 +55,7 @@ if($s3->doesObjectExist(S3_BUCKET, IMAGELIST_FILE)){
 	</nav>
 	<div class="row">
     	<div class="col-md-1"></div>
-    	<div class="col-md-10"><h2>Files in Redis</h2></div>
+    	<div class="col-md-10"><h2>Image Files</h2></div>
     	<div class="col-md-1"></div>
     </div>
 	<div class="row">
