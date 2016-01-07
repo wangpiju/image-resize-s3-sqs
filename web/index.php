@@ -3,12 +3,17 @@ header("Content-type: text/html; charset=utf-8");
 require('config.php');
 require('../vendor/autoload.php');
 use Aws\S3\S3Client;
+use Aws\Sqs\SqsClient;
 
-$redis = new Predis\Client(getenv('REDIS_URL'));
 
 $s3 = new S3Client([
     'version' => S3_VERSION,
     'region'  => S3_REGION
+]);
+
+$sqs = new SqsClient([
+    'version' => SQS_VERSION,
+    'region'  => SQS_REGION
 ]);
 
 $message = "";
@@ -20,12 +25,9 @@ if(!empty($_POST['submit'])){
         $filesize = $_FILES["uploadfile"]["size"];
         $filedata = file_get_contents($file);
         $bucket = $_POST['bucket'];
-        // insert into redis use base64
         $base64 = base64_encode(file_get_contents($file));
         $filekey = $filename.DATA_SEPARATOR.$filetype.DATA_SEPARATOR.$filesize.DATA_SEPARATOR.time().DATA_SEPARATOR.$bucket;
-        $redis->mset($filekey, $base64);
-
-        // // create or update imagelist.txt
+        // create or update imagelist.txt
         if($s3->doesObjectExist(S3_BUCKET, IMAGELIST_FILE)){
             // exsist
             $txtfile = $s3->getObject([
@@ -60,21 +62,49 @@ if(!empty($_POST['submit'])){
                 $message .= "There was an error creating imagelist.txt.\r\n";
             }
         }
-        
+               
         // upload file to selected bucket
         try {
+            $result = $sqs->sendMessage(array(
+                'QueueUrl'      => SQS_INBOX,
+                'MessageBody'   => 'Resize file',
+                'MessageAttributes' => array(
+                    's3path' => array(
+                        'StringValue' => S3_PATH,
+                        'DataType' => 'String',
+                    ),
+                    's3bucket' => array(
+                        'StringValue' => $bucket,
+                        'DataType' => 'String',
+                    ),
+                    'filename' => array(
+                        'StringValue' => $filename,
+                        'DataType' => 'String',
+                    ),
+                    'filetype' => array(
+                        'StringValue' => $filetype,
+                        'DataType' => 'String',
+                    ),
+                    'filesize' => array(
+                        'StringValue' => $filesize,
+                        'DataType' => 'String',
+                    )
+                ),
+            ));
             $s3->putObject([
                 'Bucket' => $bucket,
                 'Key'    => $filename,
                 'Body'   => $filedata,
                 'ACL'    => 'public-read',  // use read
             ]);
+             
             $message .= "Successfully uploaded file.\r\n";
         } catch (Aws\Exception\S3Exception $e) {
             $message .= "There was an error uploading the file.\r\n";
         }
+        
     }else{
-        $message .= "Something went wrong while uploading file... sorry.\r\n";
+        $message .= "You have to choose a file, sorry.\r\n";
     }
 }
 
@@ -83,7 +113,7 @@ if(!empty($_POST['submit'])){
 <html>
 <head>
 <meta charset="utf-8">
-<title>Image Upload</title>
+<title>Image Upload S3 and SQS</title>
 <!-- Bootstrap -->
 <link href="./bootstrap-3.3.6/css/bootstrap.min.css" rel="stylesheet">
 <style>
@@ -120,7 +150,7 @@ body {
     </nav>
     <div class="container">
       <div class="starter-template">
-        <h1>You can start uploading your images<br/>(using s3 and heroku redis cache)</h1>
+        <h1>You can start uploading your images<br/>(using s3 insert into SQS)</h1>
         <p class="lead"><br> </p>
       </div>
     </div>

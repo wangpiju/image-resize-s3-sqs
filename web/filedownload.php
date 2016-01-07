@@ -3,8 +3,12 @@ header("Content-type: text/html; charset=utf-8");
 require('config.php');
 require('../vendor/autoload.php');
 use Aws\S3\S3Client;
+use Aws\Sqs\SqsClient;
 
-$redis = new Predis\Client(getenv('REDIS_URL'));
+$sqs = new SqsClient([
+    'version' => SQS_VERSION,
+    'region'  => SQS_REGION
+]);
 
 $s3 = new S3Client([
     'version' => S3_VERSION,
@@ -19,12 +23,28 @@ if($s3->doesObjectExist(S3_BUCKET, IMAGELIST_FILE)){
     $txtbody = $txtfile['Body'];
     $lines = explode(PHP_EOL, $txtbody);
 }
+else{
+  $lines = array();
+}
+
+if($s3->doesObjectExist(S3_BUCKET, SMALLIMAGELIST_FILE)){
+    $smalltxtfile = $s3->getObject([
+        'Bucket'    => S3_BUCKET,
+        'Key'       => SMALLIMAGELIST_FILE
+    ]);
+    $smalltxtbody = $smalltxtfile['Body'];
+    $smalllines = explode(PHP_EOL, $smalltxtbody);
+}
+else{
+  $smalllines = array();
+}
+
 ?>
 <!doctype html>
 <html>
 <head>
 <meta charset="utf-8">
-<title>Homework 3</title>
+<title>Image Upload S3 and SQS</title>
 <link href="./bootstrap-3.3.6/css/bootstrap.min.css" rel="stylesheet">
 <style>
 body {
@@ -68,39 +88,19 @@ body {
     	<div class="col-md-10">     	   
     	    <table class="table">
                 <tr>
-                    <th>Bucket</th>
+                      <th>Bucket</th>
                     <th>File Name</th>
                     <th>File type</th>
                    
                     <th>Image</th>
-                    
+                    <th>Resized Image</th> 
                 </tr>
-            <?php 
-               $arList = $redis->keys("*");
-               //若redis有存直接從redis取出, 若沒有則用key去s3找
-               foreach($lines as $key){
-                   if($redis->exists($key)){
-                       // redis exsist
-                       $splitKey = preg_split("/@#@/", $key);
-                       
-                       $filedata = $redis->get($key);
-                       $bucket = $splitKey[4];
-                       $filename = $splitKey[0];
-                       $filetype = $splitKey[1];
-                       $filesize = $splitKey[2];
-                       echo '<tr>';
-                       echo '<td>'.$bucket.'</td>';
-                       echo '<td>'.$filename.'</td>';
-                       echo '<td>'.$filetype.'</td>';
-  
-                       echo '<td><a href="https://s3-us-west-2.amazonaws.com/'.$bucket.'/'.$filename.'"><img src="data:image/jpeg;base64,' . $filedata . '" width="100" /></a></td>';
-                       
-                       echo '</tr>';
-                   }else if($key != ''){
+               <?php 
+                foreach($lines as $key){
+                   if($key != ''){
                        // only exsist on AWS S3
                        $splitKey = preg_split("/@#@/", $key);
-                       
-                       $filedata = $redis->get($key);
+    
                        $bucket = $splitKey[4];
                        $filename = $splitKey[0];
                        $filetype = $splitKey[1];
@@ -110,12 +110,24 @@ body {
                        echo '<td>'.$filename.'</td>';
                        echo '<td>'.$filetype.'</td>';
                       
-                       echo '<td><a href="https://s3-us-west-2.amazonaws.com/'.$bucket.'/'.$filename.'"><img src="https://s3-us-west-2.amazonaws.com/'.$bucket.'/'.$filename.'" width="100" /></a></td>';
+                       echo '<td><a href="https://s3.amazonaws.com/'.$bucket.'/'.$filename.'"><img src="https://s3.amazonaws.com/'.$bucket.'/'.$filename.'" width="100" /></a></td>';
+                       $hassmallimage = false;
+                       foreach($smalllines as $smallkey){
+                          $smallsplitKey = preg_split("/@#@/", $smallkey);
+                           if($filename == $smallsplitKey[0]){
+                            echo '<td><a href="https://s3.amazonaws.com/'.$smallsplitKey[4].'/'.'thumn_'.$smallsplitKey[0].'"><img src="https://s3.amazonaws.com/'.$smallsplitKey[4].'/'.'thumn_'.$smallsplitKey[0].'" width="100" /></a></td>';
+                            $hassmallimage = true;
+                            break;
+                           }
+                       }
+
+                       if(!$hassmallimage)
+                        echo '<td></td>';
                        
                        echo '</tr>';
                    }
-               }
-            ?>
+                }
+              ?>
     	    </table>
     	
     	</div>
